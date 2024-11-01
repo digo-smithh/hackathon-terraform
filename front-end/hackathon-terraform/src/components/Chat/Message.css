@@ -1,0 +1,45 @@
+.message-wrapper {
+  display: flex;
+}
+
+.triangle {
+  position: absolute;
+  border-radius: 4px;
+  width: 15px;
+  height: 25px;
+  bottom: 2px;
+  background: #0484fd;
+}
+
+.m-left .triangle {
+  left: -4px;
+  transform: rotate(18deg);
+}
+
+.m-right .triangle {
+  right: -4px;
+  transform: rotate(-18deg);
+}
+
+.m-left {
+  margin-left: 20px;
+  justify-content: flex-start;
+}
+
+.m-right {
+  margin-right: 20px;
+  justify-content: flex-end;
+}
+
+.message {
+  background: #0484fd;
+  font-size: 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  color: whitesmoke;
+  padding: 5px 20px 5px 25px;
+  position: relative;
+  text-align: start;
+  height: fit-content;
+  width: fit-content;
+}
