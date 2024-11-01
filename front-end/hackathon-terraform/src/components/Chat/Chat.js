@@ -13,10 +13,54 @@ function Chat() {
     return frases[0];
   };
 
-  const sendMesage = () => {
-    setMessages([...messages, {text: text, side: 'client'}])
-    setText("")
-  }
+  const sendMessage = async () => {
+    // Adiciona a mensagem do cliente na lista de mensagens
+    setMessages([...messages, { text: text, side: 'client' }]);
+    setText(""); // Limpa o campo de texto
+  
+    // Faz a requisição com stream
+    const response = await fetch("http://localhost:3001/prompt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        prompt: text
+      })
+    });
+  
+    // Lê o stream da resposta
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+  
+    let responseText = ""; // Para acumular o texto da resposta
+    let done = false;
+  
+    while (!done) {
+      // Lê cada chunk do stream
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+  
+      // Decodifica o chunk e adiciona ao texto acumulado
+      const chunk = decoder.decode(value, { stream: true });
+      responseText += chunk;
+  
+      // Atualiza as mensagens enquanto o conteúdo está sendo recebido
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: chunk, side: 'bot' }
+      ]);
+    }
+  
+    // Quando a leitura terminar, garante que todo o conteúdo final seja atualizado
+    if (responseText) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: responseText.msg, side: 'bot' }
+      ]);
+    }
+  };
+  
 
   const listMessages = () => {
     return messages.map((el) => <Message text={el.text} side={el.side}></Message>)
@@ -25,7 +69,7 @@ function Chat() {
   const handleKeyPress = (event) => {
     console.log("aa")
     if(event.keyCode === 13){
-        sendMesage()
+        sendMessage()
     }
   }
 
@@ -47,7 +91,7 @@ function Chat() {
       <div className="chat-prompt">
         <div className="chat-input">
           <input placeholder={random()} value={text} onChange={(e) => {setText(e.target.value)}}></input>
-          <ion-icon onKeyPress={handleKeyPress} onClick={sendMesage} name="caret-up-circle-outline"></ion-icon>
+          <ion-icon onKeyPress={handleKeyPress} onClick={sendMessage} name="caret-up-circle-outline"></ion-icon>
         </div>
       </div>
     </div>

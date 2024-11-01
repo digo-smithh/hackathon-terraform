@@ -1,0 +1,398 @@
+Configurar região
+
+Para configurar a região do provedor, utilize o seguinte código:
+
+provider "mgc" {
+  region="br-se1"
+}
+
+Parâmetros
+
+region: Define a região para o provedor MGC. No exemplo acima, br-se1 indica a região Sudeste. Exemplo
+
+No exemplo abaixo utilizamos 2 regiões br-se1 e br-ne1 e criamos um provider para cada, adicionando um alias para facilitar o controle dos recursos de block-storage:
+
+terraform {
+  required_providers {
+    mgc = {
+      source = "magalucloud/mgc"
+    }
+  }
+}
+
+provider "mgc" {
+  alias = "sudeste"
+  region = "br-se1"
+}
+
+provider "mgc" {
+  alias  = "nordeste"
+  region = "br-ne1"
+}
+
+resource "mgc_block-storage_volumes" "block_storage" {
+    provider = mgc.nordeste
+    name = "volume-via-terraform"
+    size = 30
+    type = {
+        name = "cloud_nvme20k"
+    }
+}
+
+resource "mgc_block-storage_volumes" "block_storage-sudeste" {
+    provider = mgc.sudeste
+    name = "volume-via-terraform"
+    size = 30
+    type = {
+        name = "cloud_nvme20k"
+    }
+}
+
+Environment Variables MGC
+Introduction
+
+This documentation describes how to configure and use the following environment variables for Terraform and the CLI:
+
+    MGC_API_KEY
+    MGC_OBJ_KEY_ID
+    MGC_OBJ_KEY_SECRET
+    MGC_REGION
+    MGC_ENV
+
+These environment variables are used for authentication and environment configuration when interacting with the provided infrastructure and services.
+
+    MGC_API_KEY - API key for authentication. More information.
+
+    MGC_OBJ_KEY_ID - Key ID to access the Object Storage product. More information.
+
+    MGC_OBJ_KEY_SECRET - Secret of the key to access the Object Storage product. More information.
+
+    MGC_REGION - Specifies the region where resources will be created and managed.
+
+    MGC_ENV - Defines the operating environment to differentiate between different phases of development..
+
+Configuration in Terraform
+
+Example:
+
+provider "mgc" {
+  alias = "nordeste"
+  region = var.mgc_region
+  api_key = var.mgc_api_key
+  object_storage = {
+    key_pair = {
+      key_id = var.mgc_obj_key_id
+      key_secret = var.mgc_obj_key_secret
+    }
+  }
+}
+
+variable "mgc_api_key" {
+  description = "API key for authentication."
+}
+
+variable "mgc_obj_key_id" {
+  description = "Key ID to access the Object Storage product."
+}
+
+variable "mgc_obj_key_secret" {
+  description = "Secret of the key to access the Object Storage product."
+}
+
+variable "mgc_region" {
+  description = "Specifies the region where resources will be created and managed."
+}
+
+variable "mgc_env" {
+  description = "Defines the operating environment"
+}
+
+mgc_ssh_keys (Resource)
+
+Add a new SSH key to your account
+Example Usage
+
+resource "mgc_ssh_keys" "my_key" {
+  name = "my_new_key"
+  key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP+E3U/DpNagT79ueF+xQn9dNFUKheopjx/kIBC1qQM3"
+}
+
+Schema
+Required
+
+    key (String) Public key
+    name (String) Name of the SSH key
+
+Read-Only
+
+    id (String) ID of the SSH key
+
+
+mgc_virtual_machine_instances (Resource)
+
+Operations with instances, including create, delete, start, stop, reboot and other actions.
+Example Usage
+
+resource "mgc_virtual_machine_instances" "basic_instance" {
+  name     = "basic-instance"
+  machine_type = {
+    name = "cloud-bs1.xsmall"
+  }
+  image = {
+    name = "cloud-ubuntu-22.04 LTS"
+  }
+  network = {
+    associate_public_ip = false # If true, will create a public IP
+    delete_public_ip    = false
+  }
+
+  ssh_key_name = "ssh_key"
+}
+
+
+resource "mgc_virtual_machine_instances" "basic_instance_with_SG" {
+  name = "basic-instance"
+  machine_type = {
+    name = "cloud-bs1.xsmall"
+  }
+  image = {
+    name = "cloud-ubuntu-22.04 LTS"
+  }
+  network = {
+    associate_public_ip = false # If true, will create a public IP
+    delete_public_ip = false
+    interface = {
+      security_groups = [{ id = "aa622bcb-6861-4251-9cdb-aaadf3" }]
+    }
+  }
+  ssh_key_name = "ssh_key"
+}
+
+Schema
+Required
+
+    image (Attributes) The image used to create the virtual machine instance. (see below for nested schema)
+    machine_type (Attributes) The machine type of the virtual machine instance. (see below for nested schema)
+    name (String) The name of the virtual machine instance.
+
+Optional
+
+    name_is_prefix (Boolean) Indicates whether the provided name is a prefix or the exact name of the virtual machine instance.
+    network (Attributes) The network configuration of the virtual machine instance. (see below for nested schema)
+    ssh_key_name (String) The name of the SSH key associated with the virtual machine instance. If the image is Windows, this field is not used.
+
+Read-Only
+
+    created_at (String) The timestamp when the virtual machine instance was created.
+    final_name (String) The final name of the virtual machine instance after applying any naming conventions or modifications.
+    id (String) The unique identifier of the virtual machine instance.
+    state (String) The current state of the virtual machine instance.
+    status (String) The status of the virtual machine instance.
+    updated_at (String) The timestamp when the virtual machine instance was last updated.
+
+Nested Schema for image
+
+Required:
+
+    name (String) The name of the image.
+
+Read-Only:
+
+    id (String) The unique identifier of the image.
+
+Nested Schema for machine_type
+
+Required:
+
+    name (String) The name of the machine type.
+
+Read-Only:
+
+    disk (Number) The disk size of the machine type.
+    id (String) The unique identifier of the machine type.
+    ram (Number) The RAM size of the machine type.
+    vcpus (Number) The number of virtual CPUs of the machine type.
+
+Nested Schema for network
+
+Required:
+
+    associate_public_ip (Boolean) Indicates whether to associate a public IP address with the virtual machine instance.
+
+Optional:
+
+    delete_public_ip (Boolean) Indicates whether to delete the public IP address associated with the virtual machine instance.
+    interface (Attributes) The network interface configuration of the virtual machine instance. (see below for nested schema)
+    vpc (Attributes) The VPC (Virtual Private Cloud) associated with the virtual machine instance. (see below for nested schema)
+
+Read-Only:
+
+    ipv6 (String) The IPv6 address of the virtual machine instance.
+    private_address (String) The private IP address of the virtual machine instance.
+    public_address (String) The public IP address of the virtual machine instance.
+
+Nested Schema for network.interface
+
+Optional:
+
+    security_groups (Attributes List) The security groups associated with the network interface. (see below for nested schema)
+
+Nested Schema for network.interface.security_groups
+
+Optional:
+
+    id (String) The unique identifier of the security group.
+
+Nested Schema for network.vpc
+
+Optional:
+
+    id (String) The unique identifier of the VPC.
+    name (String) The name of the VPC.
+
+Import
+
+Import is supported using the following syntax:
+
+terraform import mgc_virtual_machine_instances.basic_instance 123
+
+mgc_virtual_machine_snapshots (Resource)
+
+Operations with snapshots for instances.
+Example Usage
+
+resource "mgc_virtual_machine_snapshots" "basic_snapshot" {
+  name = "basic-snapshot"
+  virtual_machine_id = "a132d346-cfe9-4f0e-bf88-4688437ee8fe"
+}
+
+Schema
+Required
+
+    name (String) The name of the snapshot.
+    virtual_machine_id (String) The ID of the virtual machine.
+
+Read-Only
+
+    created_at (String) The timestamp when the snapshot was created.
+    id (String) The ID of the snapshot.
+    updated_at (String) The timestamp when the snapshot was last updated
+
+
+mgc_virtual_machine_images (Data Source)
+
+Get the available virtual-machine images.
+Example Usage
+
+data "mgc_virtual_machine_images" "images" {
+}
+
+output "vm_images" {
+  value = data.mgc_virtual_machine_images.images
+}
+
+Schema
+Read-Only
+
+    images (Attributes List) List of available VM Images. (see below for nested schema)
+
+Nested Schema for images
+
+Read-Only:
+
+    id (String) ID of image.
+    name (String) The image name.
+    platform (String) The image platform.
+
+
+mgc_virtual_machine_instance (Data Source)
+
+Get the available virtual-machine instance details
+Example Usage
+
+data "mgc_virtual_machine_instances" "instances" {
+  id = mgc_virtual_machine_instances.my_vm.id
+}
+
+output "vm_instances" {
+  value = data.mgc_virtual_machine_instances.instances
+}
+
+Schema
+Required
+
+    id (String) ID of machine-type.
+
+Read-Only
+
+    image_id (String) Image ID of instance
+    machine_type_id (String) Machine type ID of instance
+    name (String) Name of type.
+    private_ipv4 (String) Private IPV4
+    public_ipv4 (String) Public IPV4.
+    public_ipv6 (String) Public IPV6.
+    ssh_key_name (String) SSH Key name
+    state (String) State of instance
+    status (String) Status of instance.
+
+
+mgc_virtual_machine_instances (Data Source)
+
+Get the available virtual-machine instances.
+Example Usage
+
+data "mgc_virtual_machine_instances" "instances" {
+}
+
+output "vm_instances" {
+  value = data.mgc_virtual_machine_instances.instances
+}
+
+Schema
+Read-Only
+
+    instances (Attributes List) List of available VM instances. (see below for nested schema)
+
+Nested Schema for instances
+
+Read-Only:
+
+    id (String) ID of machine-type.
+    image_id (String) Image ID of instance
+    machine_type_id (String) Machine type ID of instance
+    name (String) Name of type.
+    private_ipv4 (String) Private IPV4
+    public_ipv4 (String) Public IPV4.
+    public_ipv6 (String) Public IPV6.
+    ssh_key_name (String) SSH Key name
+    state (String) State of instance
+    status (String) Status of instance.
+
+
+mgc_virtual_machine_types (Data Source)
+
+Get the available virtual-machine types.
+Example Usage
+
+data "mgc_virtual_machine_types" "types" {
+}
+
+output "vm_types" {
+  value = data.mgc_virtual_machine_types.types
+}
+
+Schema
+Read-Only
+
+    machine_types (Attributes List) List of available VM machine-types. (see below for nested schema)
+
+Nested Schema for machine_types
+
+Read-Only:
+
+    disk (Number) Disk
+    gpu (Number) GPU
+    id (String) ID of machine-type.
+    name (String) Name of type.
+    ram (Number) Ram
+    vcpu (Number) VCpu
