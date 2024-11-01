@@ -1,5 +1,21 @@
+@font-face {
+  font-family: 'default';
+  src: local('MyFont'), url(./assets/fonts/magalu-textos-regular.woff2) format('woff');
+}
+
+@font-face {
+  font-family: 'defaultBold';
+  src: local('MyFont'), url(./assets/fonts/magalu-textos-regular.woff2) format('woff');
+}
+
 .App {
-  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'default';
+  width: 100vw;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-logo {
@@ -14,7 +30,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #dbdbdb;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -35,4 +51,30 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.central-content {
+  padding: 0px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.header h1 {
+  margin-bottom: 0;
+}
+
+.header p {
+  margin-top: 10px;
+  font-size: 20px;
+}
+
+.fields {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 50px;
+  margin-top: 20px;
 }

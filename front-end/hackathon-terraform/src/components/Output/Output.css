@@ -1,0 +1,25 @@
+
+  
+  .codeBlock {
+    text-align: left;
+  }
+  
+  .output {
+    padding: 15px;
+    padding-top: 30px;
+    width: 40vw;
+    height: 65vh;
+    background-color: #c9e4fd;
+    box-shadow: 0 0 10px 2px rgb(233, 233, 233);
+    border-radius: 10px;
+  }
+  
+  .output div, .output div span {
+    background: #deebf7!important;
+  }
+
+  .codeBlockContainer {
+    overflow: auto;
+    height: 65vh;
+    font-size: 13px;
+  }

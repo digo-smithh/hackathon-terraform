@@ -1,0 +1,81 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+  background: #deebf7;
+  border-radius: 10px;
+  height: 70vh;
+  box-shadow: 0 0 10px 2px rgb(233, 233, 233);
+}
+
+.magalu {
+  background: #c9e4fd;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px 10px 0 0;
+  padding: 10px 15px;
+  color: black;
+}
+
+.magalu .nome {
+  font-weight: bold;
+  color: rgb(80, 80, 80);
+  margin-left: 10px;
+}
+
+.magalu .status {
+  color: green;
+  font-weight: bolder;
+}
+
+.magalu img {
+  width: 40px;
+  border-radius: 100px;
+}
+
+.conversation {
+  flex: 1;
+  padding-bottom: 25px;
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: auto;
+}
+
+
+.chat-prompt {
+  background: #dceeff;
+  border-radius: 10px;
+}
+
+.chat-input {
+  display: flex;
+  background: #c9e4fd;
+  padding: 10px;
+  gap: 10px;
+  align-items: center;
+  border-radius: 0 0 10px 10px;
+}
+
+.chat-input ion-icon {
+  font-size: 2.8em;
+  color: #0586ff;
+}
+
+.chat-input input {
+  flex: 1;
+  border-radius: 100px;
+  border: none;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+.chat-input input::placeholder {
+  font-size: 16px;
+}
+
+.conversation {
+  border-radius: 10px;
+}
